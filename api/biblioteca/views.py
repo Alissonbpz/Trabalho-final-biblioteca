@@ -15,3 +15,10 @@ def lista_livros(request):
     for livro in Livro.objects.all():
         dados.append(mdp_dicionario(livro))
     return JsonResponse({"livros": dados})
+
+def livro(request, id):
+    try:
+        l = Livro.objects.get(id=id)
+    except Livro.DoesNotExist:
+        return JsonResponse({"erro": "Livro não encontrado"}, status=404)
+    return JsonResponse(mdp_dicionario(l))
