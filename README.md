@@ -6,13 +6,33 @@ Projeto final da disciplina de Programação III: desenvolvimento de um sistema 
 - Alisson Paz
 - Eduardo Jacobi
 
+## Estrutura do projeto
+
+- `api/`: projeto Django (API REST), com o banco `db.sqlite3` e o `requirements.txt`
+- `app/`: aplicativo usando Flet que consome a API
+
+### API (Django)
+
+Na pasta `api`, no terminal:
+
+```
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python manage.py runserver
+```
+
+A API fica em `http://127.0.0.1:8000/livros/`
+
 ## Rotas da API
 
 | Método | Rota | Sucesso | Erros possíveis |
 |--------|------|---------|-----------------|
-| GET | /livros/ | 200 · a lista | — |
-| GET | /livros/?busca=python | 200 · a lista filtrada | — |
-| POST | /livros/ | 201 · o livro criado | 400 |
-| GET | /livros/<id>/ | 200 · o livro | 404 |
-| PUT | /livros/<id>/ | 200 · o livro alterado | 400 · 404 |
-| DELETE | /livros/<id>/ | 204 · sem corpo | 404 |
+| GET | `/livros/` | 200 · a lista | — |
+| GET | `/livros/?busca=python` | 200 · a lista filtrada | — |
+| POST | `/livros/` | 201 · o livro criado | 400 |
+| GET | `/livros/<id>/` | 200 · o livro | 404 |
+| PUT | `/livros/<id>/` | 200 · o livro alterado | 400 · 404 |
+| DELETE | `/livros/<id>/` | 204 · sem corpo | 404 |
+
+### App (Flet)
