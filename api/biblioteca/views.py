@@ -31,12 +31,18 @@ def lista_livros(request):
         dados.append(mdp_dicionario(l))
     return JsonResponse({"livros": dados})
 
+@csrf_exempt
 def livro(request, id):
     try:
-        l = Livro.objects.get(id=id)
+        a = Livro.objects.get(id=id)
     except Livro.DoesNotExist:
         return JsonResponse({"erro": "Livro não encontrado"}, status=404)
-    return JsonResponse(mdp_dicionario(l))
+    if request.method == "PUT":
+        return alterar(request, a)
+    if request.method == "DELETE":
+        a.delete()
+        return HttpResponse(status=204)
+    return JsonResponse(mdp_dicionario(a))
 
 def validar(dados):
     if not dados.get("titulo"):
@@ -69,3 +75,17 @@ def cadastrar(request):
         disponivel=dados.get("disponivel", True),
     )
     return JsonResponse(mdp_dicionario(x), status=201)
+
+def alterar(request, alt):
+    dados = ler_json(request)
+    if dados is None:
+        return JsonResponse({"erro": "JSON inválido"}, status=400)
+    erro = validar(dados)
+    if erro:
+        return JsonResponse({"erro": erro}, status=400)
+    alt.titulo = dados["titulo"]
+    alt.autor = dados["autor"]
+    alt.ano = dados["ano"]
+    alt.disponivel = dados.get("disponivel", True)
+    alt.save()
+    return JsonResponse(mdp_dicionario(alt), status=200)
