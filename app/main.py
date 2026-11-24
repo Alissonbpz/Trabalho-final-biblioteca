@@ -8,11 +8,12 @@ def main(page: ft.Page):
     
     lista = ft.Column(scroll=ft.ScrollMode.AUTO, expand=True)
     aviso = ft.Text("", size=12, color=ft.Colors.RED_600)
+    busca_livro = ft.TextField(label="Buscar por título", width=320)
 
     def carregar(e=None):
         lista.controls.clear()
         try:
-            resp = requests.get(URL)
+            resp = requests.get(URL, params={"busca": busca_livro.value})
         except requests.exceptions.ConnectionError:
             aviso.value = "Não foi possível conectar à API. Ela está ligada?"
             page.update()
@@ -38,9 +39,7 @@ def main(page: ft.Page):
 
     botao = ft.Button(content=ft.Text("Atualizar"), on_click=carregar)
 
-    page.add(botao, lista, aviso)
+    page.add(busca_livro, botao, lista, aviso)
     carregar()
-
-
 
 ft.run(main)
