@@ -1,6 +1,8 @@
 import flet as ft
 import requests
 
+URL = "http://127.0.0.1:8000/livros/"
+
 def main(page: ft.Page):
     page.title = "Biblioteca"
     
@@ -15,12 +17,12 @@ def main(page: ft.Page):
             aviso.value = "Não foi possível conectar à API. Ela está ligada?"
             page.update()
             return
-        livros = resp.json()["..."]
+        livros = resp.json()["livros"]
         for livro in livros:
             if livro["disponivel"]:
                 status = "Disponível"
             else:
-                status = ...
+                status = "Indisponível"
             lista.controls.append(
                 ft.Card(
                     content=ft.Container(
