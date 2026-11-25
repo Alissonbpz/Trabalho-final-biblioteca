@@ -53,6 +53,36 @@ def main(page: ft.Page):
             )
             page.show_dialog(dialogo)
 
+    def excluir(livro_id):
+        try:
+            resp = requests.delete(f"{URL}{livro_id}/")
+        except requests.exceptions.ConnectionError:
+            aviso.value = "Não foi possível conectar à API. Ela está ligada?"
+            page.update()
+            return
+        carregar()
+        if resp.status_code == 404:
+            aviso.value = "Esse livro não existe mais."
+            page.update()
+
+    def confirmar_exclusao(livro):
+        def sim(e):
+            page.pop_dialog()
+            excluir(livro["id"])
+
+        def nao(e):
+            page.pop_dialog()
+
+        dialogo = ft.AlertDialog(
+            title=ft.Text("Excluir livro"),
+            content=ft.Text(f'Deseja excluir "{livro["titulo"]}"?'),
+            actions=[
+                ft.TextButton("Não", on_click=nao),
+                ft.TextButton("Sim", on_click=sim),
+            ],
+        )
+        page.show_dialog(dialogo)
+
     def carregar(e=None):
         lista.controls.clear()
         try:
@@ -68,11 +98,20 @@ def main(page: ft.Page):
             else:
                 status = "Indisponível"
             lista.controls.append(
-                ft.Card(
+               ft.Card(
                     content=ft.Container(
                         padding=10,
-                        content=ft.Text(
-                            f'{livro["titulo"]} - {livro["autor"]} ({livro["ano"]}) | {status}'
+                        content=ft.Row(
+                            controls=[
+                                ft.Text(
+                                    f'{livro["titulo"]} - {livro["autor"]} ({livro["ano"]}) | {status}',
+                                    expand=True,
+                                ),
+                                ft.IconButton(
+                                    icon=ft.Icons.DELETE,
+                                    on_click=lambda e, l=livro: confirmar_exclusao(l),
+                                ),
+                            ]
                         ),
                     )
                 )
