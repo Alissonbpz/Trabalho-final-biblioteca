@@ -10,6 +10,49 @@ def main(page: ft.Page):
     aviso = ft.Text("", size=12, color=ft.Colors.RED_600)
     busca_livro = ft.TextField(label="Buscar por título", width=320)
 
+    def abrir_formulario():
+            titulo = ft.TextField(label="Título")
+            autor = ft.TextField(label="Autor")
+            ano = ft.TextField(label="Ano")
+            disponivel = ft.Checkbox(label="Disponível", value=True)
+            txt_erro = ft.Text("", color = ft.Colors.RED_600)
+
+
+            def cancelar(e):
+                page.pop_dialog()
+
+
+            def salvar(e):
+                dados = {
+                    "titulo": titulo.value,
+                    "autor": autor.value,
+                    "ano": ano.value,
+                    "disponivel": disponivel.value,
+                }
+                try:
+                    resp = requests.post(URL, json=dados)
+                except requests.exceptions.ConnectionError:
+                    txt_erro.value = "Não foi possível conectar à API. O servidor está ligado?"
+                    page.update()
+                    return
+                if resp.status_code == 400:
+                    txt_erro.value = resp.json()["erro"]
+                    page.update()
+                    return
+                page.pop_dialog()
+                carregar()
+
+
+            dialogo = ft.AlertDialog(
+                title=ft.Text("Novo livro"),
+                content=ft.Column([titulo, autor, ano, disponivel, txt_erro], tight=True),
+                actions=[
+                    ft.TextButton("Cancelar", on_click=cancelar),
+                    ft.TextButton("Salvar", on_click=salvar),
+                ],
+            )
+            page.show_dialog(dialogo)
+
     def carregar(e=None):
         lista.controls.clear()
         try:
@@ -38,8 +81,9 @@ def main(page: ft.Page):
         page.update()
 
     botao = ft.Button(content=ft.Text("Atualizar"), on_click=carregar)
+    botao_cadastrar_livro = ft.Button(content=ft.Text("Cadastrar livro"), on_click=lambda e: abrir_formulario())
 
-    page.add(busca_livro, botao, lista, aviso)
+    page.add(busca_livro, botao, botao_cadastrar_livro, lista, aviso)
     carregar()
 
 ft.run(main)
