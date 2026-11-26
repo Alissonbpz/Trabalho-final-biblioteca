@@ -36,3 +36,14 @@ A API fica em `http://127.0.0.1:8000/livros/`
 | DELETE | `/livros/<id>/` | 204 · sem corpo | 404 |
 
 ### App (Flet)
+
+Com a API ligada, abra outro terminal na raiz do projeto:
+
+```
+.venv\Scripts\Activate.ps1
+python -m pip install -r app/requirements.txt
+cd app
+python main.py
+```
+
+A API precisa estar rodando antes de abrir o app. O app lista, busca, cadastra, edita e exclui livros, e mostra avisos quando o servidor está rodando ou a API devolve o erro.
