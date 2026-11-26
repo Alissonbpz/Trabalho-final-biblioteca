@@ -35,7 +35,7 @@ def main(page: ft.Page):
                     "disponivel": disponivel.value,
                 }
                 try:
-                    if livro is not None:
+                    if livro is None:
                         resp = requests.post(URL, json=dados)
                     else:
                         resp = requests.put(f"{URL}{livro['id']}/", json=dados)
