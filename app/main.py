@@ -6,9 +6,15 @@ URL = "http://127.0.0.1:8000/livros/"
 def main(page: ft.Page):
     page.title = "Biblioteca"
     
+    titulo = ft.Text(
+        "Biblioteca",
+        size=32,
+        weight=ft.FontWeight.BOLD
+    )
+    
     lista = ft.Column(scroll=ft.ScrollMode.AUTO, expand=True)
     aviso = ft.Text("", size=12, color=ft.Colors.RED_600)
-    busca_livro = ft.TextField(label="Buscar por título", width=320)
+    busca_livro = ft.TextField(label="Buscar por título", width=500)
 
     def abrir_formulario(livro=None):
             titulo = ft.TextField(label="Título")
@@ -137,10 +143,56 @@ def main(page: ft.Page):
         aviso.value = ""
         page.update()
 
-    botao = ft.Button(content=ft.Text("Atualizar"), on_click=carregar)
-    botao_cadastrar_livro = ft.Button(content=ft.Text("Cadastrar livro"), on_click=lambda e: abrir_formulario())
+    botao = ft.Button(
+        content=ft.Text("Buscar"),
+        icon=ft.Icons.SEARCH,
+        bgcolor=ft.Colors.BLUE_700,
+        color=ft.Colors.WHITE,
+        width=140,
+        height=42,
+        on_click=carregar
+    )
 
-    page.add(busca_livro, botao, botao_cadastrar_livro, lista, aviso)
+    botao_cadastrar_livro = ft.Button(
+        content=ft.Text("Cadastrar livro"),
+        icon=ft.Icons.ADD,
+        bgcolor=ft.Colors.GREEN_700,
+        color=ft.Colors.WHITE,
+        width=180,
+        height=42,
+        on_click=lambda e: abrir_formulario()
+    )
+
+    page.padding = 25
+    page.spacing = 20
+
+    page.add(
+    ft.Row(
+        controls=[
+            ft.Icon(
+                ft.Icons.MENU_BOOK,
+                size=35,
+                color=ft.Colors.BLUE_400
+            ),
+            titulo
+        ],
+        alignment=ft.MainAxisAlignment.CENTER,
+        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+        spacing=10
+    ),
+    ft.Row(
+        controls=[
+            busca_livro,
+            botao,
+            botao_cadastrar_livro
+        ],
+        alignment=ft.MainAxisAlignment.CENTER,
+        spacing=10
+    ),
+    ft.Divider(),
+    lista,
+    aviso
+)
     carregar()
 
 ft.run(main)
