@@ -10,13 +10,18 @@ def main(page: ft.Page):
     aviso = ft.Text("", size=12, color=ft.Colors.RED_600)
     busca_livro = ft.TextField(label="Buscar por título", width=320)
 
-    def abrir_formulario():
+    def abrir_formulario(livro=None):
             titulo = ft.TextField(label="Título")
             autor = ft.TextField(label="Autor")
             ano = ft.TextField(label="Ano")
             disponivel = ft.Checkbox(label="Disponível", value=True)
             txt_erro = ft.Text("", color = ft.Colors.RED_600)
 
+            if livro is not None:
+                titulo.value = livro["titulo"]
+                autor.value = livro["autor"]
+                ano.value = str(livro["ano"])
+                disponivel.value = livro["disponivel"]
 
             def cancelar(e):
                 page.pop_dialog()
@@ -30,7 +35,10 @@ def main(page: ft.Page):
                     "disponivel": disponivel.value,
                 }
                 try:
-                    resp = requests.post(URL, json=dados)
+                    if livro is not None:
+                        resp = requests.post(URL, json=dados)
+                    else:
+                        resp = requests.put(f"{URL}{livro['id']}/", json=dados)
                 except requests.exceptions.ConnectionError:
                     txt_erro.value = "Não foi possível conectar à API. O servidor está ligado?"
                     page.update()
@@ -39,12 +47,18 @@ def main(page: ft.Page):
                     txt_erro.value = resp.json()["erro"]
                     page.update()
                     return
+                if resp.status_code == 404:
+                    page.pop_dialog()
+                    carregar()
+                    aviso.value = "Esse livro não existe mais."
+                    page.update()
+                    return
                 page.pop_dialog()
                 carregar()
 
 
             dialogo = ft.AlertDialog(
-                title=ft.Text("Novo livro"),
+                title=ft.Text("Novo livro" if livro is None else "Editar livro"),
                 content=ft.Column([titulo, autor, ano, disponivel, txt_erro], tight=True),
                 actions=[
                     ft.TextButton("Cancelar", on_click=cancelar),
@@ -106,6 +120,10 @@ def main(page: ft.Page):
                                 ft.Text(
                                     f'{livro["titulo"]} - {livro["autor"]} ({livro["ano"]}) | {status}',
                                     expand=True,
+                                ),
+                                 ft.IconButton(
+                                    icon=ft.Icons.EDIT,
+                                    on_click=lambda e, l=livro: abrir_formulario(l),
                                 ),
                                 ft.IconButton(
                                     icon=ft.Icons.DELETE,
